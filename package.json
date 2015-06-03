@@ -1,0 +1,19 @@
+{
+  "name": "cloudchat",
+  "version": "1.0.0",
+  "description": "This's a flexible, scalable and easy to deploy chat platform",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://thoqbk@github.com/thoqbk/cloudchat.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/thoqbk/cloudchat/issues"
+  },
+  "homepage": "https://github.com/thoqbk/cloudchat"
+}

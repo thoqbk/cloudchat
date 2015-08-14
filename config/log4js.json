@@ -1,0 +1,13 @@
+{
+    "appenders": [
+        {
+            "type": "console",
+            "layout": {
+                "type": "pattern",
+                "pattern": "%m"
+            },
+            "category": "app"
+        }
+    ],
+    "replaceConsole": false
+}

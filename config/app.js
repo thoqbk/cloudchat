@@ -5,9 +5,9 @@
  * Tho Q Luong, June 15, 2015
  */
 module.exports = {
-    port:8689,
-    controllers:[
-        "controller/user-controller",
-        "controller/message-controller"
-    ]
+    port: 8689,
+    sessionChecker: {
+        period: 5000, //ms
+        timeout: 60000
+    }
 };

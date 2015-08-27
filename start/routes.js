@@ -20,7 +20,7 @@ module.exports = function (route) {
 
     route.iq("cloudchat:user:login", "UserController@login");
 
-    route.iq("io:cloudchat:message:create", "MessageConroller@create");
+    route.iq("io:cloudchat:message:create", "MessageController@create");
 
     route.iq("cloudchat:chat:create", "ChatController@create");
 
@@ -29,4 +29,6 @@ module.exports = function (route) {
     route.m("io:cloudchat:user:create", "UserController@create");
 
     route.m("io:cloudchat:user:update", "UserController@update");
+
+    route.iq("io:cloudchat:user:update-window-state", "UserController@updateWindowState");
 };

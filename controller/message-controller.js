@@ -9,7 +9,7 @@
 
 module.exports = MessageController;
 
-function MessageController(sessionService, userService) {
+function MessageController(messageService, $response) {
 
     /**
      * message: {
@@ -21,15 +21,20 @@ function MessageController(sessionService, userService) {
      * @returns {undefined}
      */
     this.create = function ($input) {
-        var receiverId = $input.get("receiverId");
-        var receiverSockets = sessionService.getSocketsByUserId(receiverId);
-        receiverSockets.forEach(function(receiverSocket){
-            receiverSocket.emit("cloudchat",{
-                senderId: $input.getUserId(),
-                ns:"io:cloudchat:message:create",
-                type:"m",
-                content: $input.get("content")
-            });
+        var receiverId = $input.getReceiverId();
+        $response.to(receiverId, {
+            senderId: $input.getUserId(),
+            receiverId: receiverId,
+            ns: "io:cloudchat:message:create",
+            stanza: "m",
+            body: {content: $input.get("content")}
+        });
+        //save message
+        messageService.create({
+            senderId: $input.getUserId(),
+            receiverId: receiverId,
+            content: $input.get("content"),
+            timestamp: (new Date()).getTime()
         });
     };
 

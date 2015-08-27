@@ -7,19 +7,26 @@
  * 
  */
 
+//config
+var $config = require("../config/app.js");
+
 //logger
 var log4js = require("log4js");
-log4js.configure("./config/log4js.json");
+log4js.configure("config/log4js.json");
 var $logger = log4js.getLogger("app");
 
 //event service
-var Event = require("../lib/event");
+var Event = require("../lib/event.js");
 
 //user service
 var UserService = require("../lib/service/user-service.js");
 
 //session service
 var SessionService = require("../lib/session-service.js");
+
+var MessageService = require("../lib/service/message-service.js");
+
+var Response = require("../lib/response.js");
 
 /**
  * 
@@ -28,8 +35,11 @@ var SessionService = require("../lib/session-service.js");
  * @returns {undefined}
  */
 module.exports = function (register, registerClass) {
+    register("$config", $config);
     register("$logger", $logger);
     registerClass("$event", Event);
     registerClass("userService", UserService);
     registerClass("sessionService", SessionService);
+    registerClass("messageService", MessageService);
+    registerClass("$response", Response);
 };

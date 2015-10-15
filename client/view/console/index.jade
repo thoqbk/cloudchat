@@ -1,0 +1,21 @@
+table(id="table-content" style="width:100%" )
+    tr
+        td(style="width: 20%;border-right: 1px solid #CCC;vertical-align: top" )
+            div(ng-repeat="chat in chats" )
+                a(class="cloudchat-command-link" 
+                    ng-click="$emit('cloudchat.run','$cw ' + chat.friend.username)"
+                    style = "{{chat == activeChat ? 'text-decoration: underline':''}}" )
+                    |{{chat.friend.fullName}}
+        td(style="vertical-align: top;height:{{contentBox.height + 'px'}}")
+            div( id="content-box" style="height:100%;width:100%;overflow-y:auto" )
+                include messages.jade
+                include friends.jade
+
+textarea( id="command-input"
+        ng-keypress="onInputKeypress($event)" 
+        ng-keyup="onInputKeyup($event)"
+        ng-keydown="onInputKeydown($event)"
+        ng-trim="false"
+        style="width: 100%;resize: none" 
+        rows="3" 
+        ng-model="input" )

@@ -1,0 +1,30 @@
+table(style="width:100%" border="1")
+    tr
+        td
+            |Id
+        td
+            |{{form.user.id}}
+    tr
+        td
+            |Username
+        td
+            |{{form.user.username}}
+    tr
+        td
+            |Avatar
+        td
+            img(ng-src="{{form.user.avatarPath}}")
+    tr
+        td
+            |Full Name
+        td
+            input(type="text" ng-model="form.user.fullName" ng-readonly="form.user.id != me.id || form.mode == 'detail'")
+div(ng-show="form.user.id == me.id")
+    button(ng-click="form.mode = 'update'" ng-show="form.mode == 'detail'")
+        |Edit
+    button(ng-click="save()" ng-show="form.mode == 'update'")
+        |Save
+    button(ng-click="cancelUpdate()" ng-show="form.mode == 'update'")
+        |Cancel
+
+    

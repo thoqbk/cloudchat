@@ -33,9 +33,46 @@ require("./start/controllers.js").forEach(function (filePath) {
     controllerLoader.load(filePath);
 });
 
-var app = require("http").createServer();
-var socketIO = require("socket.io")(app);
-app.listen($config.port);
+var express = require("express");
+var expressApp = express();
+var http = require("http").createServer(expressApp);
+
+//cloudchat.io client
+expressApp.set("view engine", "jade");
+expressApp.set("views", "./client/view");
+
+expressApp.use(express.static(__dirname + "/client/public"));
+
+//common js libraries
+expressApp.get("/service/string-service.js", function (req, res) {
+    res.sendFile(__dirname + "/lib/service/string-service.js");
+});
+
+var loaderJsInString = null;
+expressApp.get("/load", function (req, res) {
+    if (loaderJsInString == null) {
+        var fs = require("fs");
+        loaderJsInString = fs.readFileSync("./client/public/script/loader.js.txt", "utf8");
+    }
+    var userId = req.query.userId;
+    var compiledLoaderJsInString = loaderJsInString.replace(/\$\{meId\}/g, userId);
+    //respond
+    res.setHeader("Content-Type", "text/javascript");
+    res.setHeader("Cache-Control", "no-cache");
+    res.end(compiledLoaderJsInString);
+});
+
+expressApp.get("/", function (req, res) {
+    if (req.query.userId == null || isNaN(req.query.userId)) {
+        res.send("Missing or invalid userId");
+    } else {
+        res.render("index", {userId: req.query.userId});
+    }
+});
+
+//socket IO
+var socketIO = require("socket.io")(http);
+http.listen($config.port);
 
 socketIO.use(function (socket, next) {
     var userId = socket.handshake.query.userId;

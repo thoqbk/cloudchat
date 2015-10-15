@@ -7,7 +7,7 @@
 
 module.exports = UserController;
 
-function UserController($logger, $response) {
+function UserController($logger, $response, userService) {
 
     this.message = "This's UserController";
 
@@ -26,8 +26,19 @@ function UserController($logger, $response) {
     };
 
     this.update = function ($input) {
-        $logger.info("This's UserController.update");
-        $logger.info("City: " + $input.get("address.city") + ", username: " + $input.get("username"));
+        var user = $input.get();
+        userService.update(user)
+                .then(function (id) {
+                    userService.find({id: id}, function (err, user) {
+                        $response.echo($input.getSocket(), {
+                            id: $input.getId(),
+                            ns: $input.getNs(),
+                            stanza: "iq",
+                            type: "result",
+                            body: user
+                        });
+                    });
+                });
     };
 
     /**
@@ -62,6 +73,29 @@ function UserController($logger, $response) {
             type: "result",
             stanza: $input.getStanza(),
             body: true
+        });
+    };
+
+    this.find = function ($input) {
+        var filter = {};
+        if ($input.has("id")) {
+            filter.id = $input.get("id");
+        }
+        if ($input.has("ids")) {
+            filter.ids = $input.get("ids");
+        }
+
+        $response.echo($input.getSocket(), {
+            id: 123
+        });
+        userService.find(filter, function (err, users) {
+            $response.echo($input.getSocket(), {
+                receiverId: $input.getUserId(),
+                ns: $input.getNs(),
+                type: "result",
+                stanza: $input.getStanza(),
+                body: users
+            });
         });
     };
 }

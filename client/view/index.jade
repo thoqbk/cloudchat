@@ -1,0 +1,28 @@
+extends layout/master.jade
+block content
+    script.
+        var userId = #{userId};
+
+    script(src="/controller/app.js")
+    script(src="/service/string-service.js")
+    script(src="/service/cache-service.js")
+    script(src="/service/command-service.js")
+    script(src="/service/user-service.js")
+    script(src="/service/socket-service.js")
+
+    script(src="/controller/base-controller.js")
+    script(src="/controller/cloudchat-controller.js")
+    script(src="/controller/user-controller.js")
+
+    div(ng-app="app" ng-controller="CloudchatController" ng-cloak class="cloudchat-box")
+        div(class="cloudchat-form-footer" id="header")
+            include header.jade
+
+        div(ng-show="activeModule.code == 'home'")
+            include welcome.jade
+
+        div(ng-show="activeModule.code == 'console'")
+            include console/index.jade
+
+        div(class="cloudchat-form-footer" id="footer")
+            include footer.jade

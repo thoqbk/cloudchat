@@ -14,6 +14,7 @@
  * @returns {undefined}
  */
 module.exports = function (route) {
+    
     route.iq("cloudchat:user:find", "UserController@find");
 
     route.iq("cloudchat:user:logout", "UserController@logout");
@@ -21,6 +22,8 @@ module.exports = function (route) {
     route.iq("cloudchat:user:login", "UserController@login");
 
     route.iq("io:cloudchat:message:create", "MessageController@create");
+    
+    route.iq("io:cloudchat:message:find", "MessageController@find");
 
     route.iq("cloudchat:chat:create", "ChatController@create");
 
@@ -28,7 +31,9 @@ module.exports = function (route) {
 
     route.m("io:cloudchat:user:create", "UserController@create");
 
-    route.m("io:cloudchat:user:update", "UserController@update");
+    route.iq("io:cloudchat:user:update", "UserController@update");
 
     route.iq("io:cloudchat:user:update-window-state", "UserController@updateWindowState");
+    
+    route.iq("io:cloudchat:user:find", "UserController@find");
 };

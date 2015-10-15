@@ -18,6 +18,9 @@ var $logger = log4js.getLogger("app");
 //event service
 var Event = require("../lib/event.js");
 
+//string service
+var StringService = require("../lib/service/string-service.js");
+
 //user service
 var UserService = require("../lib/service/user-service.js");
 
@@ -38,6 +41,7 @@ module.exports = function (register, registerClass) {
     register("$config", $config);
     register("$logger", $logger);
     registerClass("$event", Event);
+    registerClass("stringService", StringService);
     registerClass("userService", UserService);
     registerClass("sessionService", SessionService);
     registerClass("messageService", MessageService);

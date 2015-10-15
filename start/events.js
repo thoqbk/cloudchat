@@ -14,6 +14,7 @@
  * @param {type} $response
  * @param {type} userService
  * @param {type} sessionService
+ * @param {type} messageService
  * @returns {undefined}
  */
 module.exports = function ($event, $logger, $response, userService, sessionService, messageService) {
@@ -42,46 +43,25 @@ module.exports = function ($event, $logger, $response, userService, sessionServi
 
     $event.listen("socket.connection", function (socket) {
         var userId = sessionService.getUserIdBySocket(socket);
-        userService.find({
-            onlineStatus: "online"
-        }, function (err, users) {
-            var onlineFriends = [];
+        userService.find({}, function (err, users) {
+            var friends = [];
             var me = null;
             users.forEach(function (user) {
                 if (user.id != userId) {
-                    onlineFriends.push(user);
+                    friends.push(user);
                 } else {
                     me = user;
                 }
             });
             var result = {
-                user: me,
-                onlineFriends: onlineFriends
+                me: me,
+                friends: friends
             };
-            //windowState
-            $session = sessionService.get(userId);
-            var deviceId = sessionService.getDeviceId(socket);
-            var windowState = $session[deviceId];
-            $logger.debug("WindowState: " + JSON.stringify(windowState));
-            if (windowState != null && windowState.activeFriendId != null) {
-                messageService.find({userIds: [windowState.activeFriendId, userId],
-                    startIdx: 0,
-                    length: 20},
-                function (err, messages) {
-                    result.messages = messages;
-                    $response.echo(socket, {
-                        ns: "io:cloudchat:auth:login",
-                        stanza: "m",
-                        body: result
-                    });
-                });
-            } else {
-                $response.echo(socket, {
-                    ns: "io:cloudchat:auth:login",
-                    stanza: "m",
-                    body: result
-                });
-            }
+            $response.echo(socket, {
+                ns: "io:cloudchat:auth:login",
+                stanza: "m",
+                body: result
+            });
         });
     });
 };

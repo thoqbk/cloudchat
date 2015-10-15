@@ -1,0 +1,15 @@
+/**
+ * Copyright (C) 2015, Cloudchat
+ * 
+ * Tho Q Luong <thoqbk@gmail.com>
+ * 
+ * Oct 9, 2015 12:35:40 AM
+ * 
+ */
+(function(w){
+    var cloudchatFrame = document.createElement("iframe");
+    cloudchatFrame.src = "http://localhost:8689/?userId=" + ${meId};
+    cloudchatFrame.width = "600px";
+    cloudchatFrame.height = "450px";
+    document.documentElement.appendChild(cloudchatFrame);
+})(window);

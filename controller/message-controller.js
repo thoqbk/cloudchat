@@ -7,6 +7,8 @@
  * 
  */
 
+var Q = require("q");
+
 module.exports = MessageController;
 
 function MessageController(messageService, $response) {
@@ -38,4 +40,32 @@ function MessageController(messageService, $response) {
         });
     };
 
+    this.find = function ($input) {
+        var messagesFilter = {startIdx: $input.get("startIdx"),
+            length: $input.get("length"),
+            userIds: $input.get("userIds")};
+        var recordsCountFilter = {startIdx: $input.get("startIdx"),
+            length: $input.get("length"),
+            userIds: $input.get("userIds"),
+            metric: "count"};
+
+        var response = {
+            id: $input.getId(),
+            ns: "io:cloudchat:message:find",
+            stanza: "iq"
+        };
+        Q.all([messageService.find(messagesFilter), messageService.find(recordsCountFilter)])
+                .spread(function (messages, recordsCount) {
+                    response.type = "result";
+                    response.body = {
+                        result: messages,
+                        recordsCount: recordsCount
+                    };
+                    $response.echo($input.getSocket(), response);
+                })
+                .fail(function (error) {
+                    response.body = error;
+                    $response.echo($input.getSocket(), response);
+                });
+    };
 }

@@ -1,0 +1,10 @@
+table(style="width:100%")
+    tr
+        td(style="height:{{body.height + 'px'}};text-align:center;vertical-align:middle")
+            span(style="font-size:32px;font-weight:bold")
+                |Cloudchat
+            br
+            span(ng-show="!socketIsReady")
+                |loading...
+            a(class="cloudchat-command-link" ng-click="$emit('cloudchat.run','$console')" ng-show="socketIsReady")
+                |console

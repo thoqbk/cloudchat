@@ -1,0 +1,24 @@
+div(ng-show="contentBox.code == 'friend'" ng-controller="UserController")
+    table(style="width:100%" border="1" ng-show="mode == 'list'")
+        tr
+            th
+                |id
+            th
+                |username
+            th
+                |full name
+            th
+        tr(ng-repeat="friend in friends")
+            td
+                |{{friend.id}}
+            td
+                a(class="cloudchat-command-link" ng-click="openUserDetail(friend)")
+                    |{{friend.username}}
+            td
+                |{{friend.fullName}}
+            td
+                a(class="cloudchat-command-link" ng-click="$emit('cloudchat.run','$cw '+friend.username)")
+                    |chat
+    div(ng-show="mode == 'profile'")
+        include profile.jade
+                

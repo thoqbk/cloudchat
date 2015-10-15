@@ -1,0 +1,70 @@
+/*
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+*/
+/* 
+    Created on : Sep 29, 2015, 11:31:56 PM
+    Author     : thoqbk
+*/
+
+body{
+    margin:0px;
+    padding:0px;
+    overflow-y:hidden;
+}
+
+.cloudchat-box{
+    width:100%;
+    height:100%;
+    margin:0px;
+    font-family:arial;
+    font-size: 13px;
+}
+
+.cloudchat-form-header{
+    background-color: #EBEEDD;
+    border-bottom-color: #CAD2A7;
+    border-bottom-style: solid;
+    border-bottom-width: 1px;
+    border-left-color: #CAD2A7;
+    border-right-color: #CAD2A7;
+    border-top-color: #CAD2A7;
+    border-top-style: solid;
+    border-top-width: 2px;
+    color: black;
+
+    font-weight: bold;
+    padding-bottom: 3px;
+    padding-top: 5px;
+}
+
+.cloudchat-form-footer{
+    background-color: #E3EAED;
+    padding-bottom: 5px;
+    padding-top: 5px;
+    border-top: 1px solid #CCC;
+    font-size: 13px;
+}
+
+.cloudchat-command-link{
+    color: #719602;
+    font-size: 13px;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.cloudchat-command-link:hover{
+    text-decoration: underline;
+}
+
+.cloudchat-message-me{
+    color: #3D7AD1;
+    font-size: 13px;
+}
+
+.cloudchat-message-friend{
+    color: #EDAD26;
+    font-size: 13px;
+}
+

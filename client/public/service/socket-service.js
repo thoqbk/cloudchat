@@ -55,15 +55,27 @@ function SocketService($rootScope) {
         }
         socketIO.emit("cloudchat", message);
     };
-
-    this.onStanzaNNs = function (stanza, ns, callback) {
-        var path = ns + "@" + stanza;
-        var callbacks = stanzaNNsNCallbacks[path];
-        if (callbacks == null) {
-            callbacks = [callback];
-        } else {
-            callbacks.push(callback);
-        }
-        stanzaNNsNCallbacks[path] = callbacks;
+    
+    /**
+     * Register event listener.
+     * 
+     * @param {type} stanza
+     * @param {type} nsOrNses can be a string or list of strings
+     * @param {type} callback
+     * @returns {undefined}
+     */
+    this.on = function (stanza, nsOrNses, callback) {
+        var isArray = Object.prototype.toString.call(nsOrNses) === '[object Array]';
+        var nses = isArray ? nsOrNses : [nsOrNses];
+        nses.forEach(function (ns) {
+            var path = ns + "@" + stanza;
+            var callbacks = stanzaNNsNCallbacks[path];
+            if (callbacks == null) {
+                callbacks = [callback];
+            } else {
+                callbacks.push(callback);
+            }
+            stanzaNNsNCallbacks[path] = callbacks;
+        });
     };
 }

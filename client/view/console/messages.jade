@@ -1,8 +1,0 @@
-div(ng-show="contentBox.code == 'chat'")
-    a( class="cloudchat-command-link" 
-        ng-show="activeChat != null && !activeChat.isUpToDate" 
-        ng-click="loadMoreMessages()").
-        Load more...
-    div( ng-repeat="message in activeChat.messages"
-         ng-bind-html="message.content"
-         class="{{message.senderId == me.id ? 'cloudchat-message-me':'cloudchat-message-friend'}}")

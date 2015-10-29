@@ -47,24 +47,30 @@ body{
     font-size: 13px;
 }
 
-.cloudchat-command-link{
+.command-link{
     color: #719602;
     font-size: 13px;
     text-decoration: none;
     cursor: pointer;
 }
 
-.cloudchat-command-link:hover{
+.command-link:hover{
     text-decoration: underline;
 }
 
 .cloudchat-message-me{
     color: #3D7AD1;
     font-size: 13px;
+    padding-bottom: 5px;
 }
 
 .cloudchat-message-friend{
     color: #EDAD26;
     font-size: 13px;
+    padding-bottom: 5px;
 }
 
+.message-timestamp{
+    color: #777;
+    font-style: italic;
+}

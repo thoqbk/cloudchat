@@ -62,6 +62,8 @@ function BaseController($scope, $rootScope) {
     this.showBody = function (code) {
         $scope.$emit("cloudchat.body.setCode", code);
     };
-
-
+    
+    this.getWhich = function (event) {
+        return event.which == 0 ? event.keyCode : event.which;
+    };
 }

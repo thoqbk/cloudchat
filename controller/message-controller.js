@@ -24,19 +24,23 @@ function MessageController(messageService, $response) {
      */
     this.create = function ($input) {
         var receiverId = $input.getReceiverId();
+        var timestamp = (new Date()).getTime();
         $response.to(receiverId, {
             senderId: $input.getUserId(),
             receiverId: receiverId,
             ns: "io:cloudchat:message:create",
             stanza: "m",
-            body: {content: $input.get("content")}
+            body: {
+                content: $input.get("content"),
+                timestamp: timestamp
+            }
         });
         //save message
         messageService.create({
             senderId: $input.getUserId(),
             receiverId: receiverId,
             content: $input.get("content"),
-            timestamp: (new Date()).getTime()
+            timestamp: timestamp
         });
     };
 

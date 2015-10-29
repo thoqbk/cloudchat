@@ -16,13 +16,15 @@ function CloudchatController($scope, $rootScope, $timeout, userService,
         commandService, socketService, cacheService) {
     //--------------------------------------------------------------------------
     //  Members
+    var self = this;
+
     $scope.socketIsReady = false;
     $scope.me = null;
     $scope.friends = null;
 
     $scope.input = "";
 
-    $scope.chats = [];//{friend, messages:{id, content, senderId}}
+    $scope.chats = [];//{friend, messages:{id, senderId, content, timestamp}}
     $scope.activeChat = null;
 
     $scope.activeModule = {
@@ -37,19 +39,51 @@ function CloudchatController($scope, $rootScope, $timeout, userService,
         height: 0
     };
 
+    $scope.clock = {
+        serverTimestamp: 0,
+        deltaTimestamp: 0
+    };
+
     //--------------------------------------------------------------------------
     //  Initialize
     var baseController = new BaseController($scope, $rootScope);
     this.__proto__ = baseController;
 
     function initialize() {
-        socketService.onStanzaNNs("m", "io:cloudchat:auth:login", function (message) {
+
+        listenSocketEvents();
+
+        var socketIO = io.connect("http://localhost:5102", {query: "userId=" + window.userId + "&deviceId=" + window.deviceId});
+        socketService.setSocketIO(socketIO);
+
+        fitWindow();
+
+        $(window).resize(function () {
+            $rootScope.$apply(function () {
+                fitWindow();
+                checkUnreadMessagesWithConditions();
+            });
+        });
+
+        $("#content-box").scroll(function () {
+            checkUnreadMessagesWithConditions();
+        });
+
+    }
+
+    function listenSocketEvents() {
+        socketService.on("m", "io:cloudchat:auth:login", function (message) {
             $scope.$broadcast("cloudchat.socket.isReady");
             $scope.socketIsReady = true;
             userService.setMe(message.body.me);
             userService.setFriends(message.body.friends);
             $scope.me = message.body.me;
             $scope.friends = message.body.friends;
+
+            //serverTimestamp
+            $scope.clock.serverTimeStamp = message.body.serverTimestamp;
+            $scope.clock.deltaTimestamp = (new Date()).getTime() - $scope.clock.serverTimeStamp;
+
             //initialize cacheService
             cacheService.setMe($scope.me);
 
@@ -63,31 +97,21 @@ function CloudchatController($scope, $rootScope, $timeout, userService,
             console.log("All friends: " + JSON.stringify(message.body.friends));
         });
 
-        socketService.onStanzaNNs("m", "io:cloudchat:message:create", function (message) {
-            var friend = $scope.getByField($scope.friends, "id", message.senderId);
-            var chat = getOrCreateChat(friend.username);
-            chat.messages.push({
-                senderId: friend.id,
-                content: message.body.content
-            });
-            //cache message
-            cacheService.saveMessage(friend.id, {
-                senderId: friend.id,
-                content: message.body.content
-            });
-        });
+        socketService.on("m", "io:cloudchat:message:create", onReceiveMessage);
 
-        var socketIO = io.connect("http://localhost:8689", {query: "userId=" + window.userId + "&deviceId=" + window.deviceId});
-        socketService.setSocketIO(socketIO);
-
-        fitWindow();
-
-        $(window).resize(function () {
-            $rootScope.$apply(function () {
-                fitWindow();
-            });
-        });
-
+        socketService.on("m", ["io:cloudchat:user:go:online", "io:cloudchat:user:go:offline"],
+                function (message) {
+                    var friendId = message.body;
+                    userService.getFriendById(friendId)
+                            .then(function (friend) {
+                                if (friend != null) {
+                                    $rootScope.$apply(function () {
+                                        var onlineStatus = message.ns == "io:cloudchat:user:go:offline" ? "offline" : "online";
+                                        friend.onlineStatus = onlineStatus;
+                                    });
+                                }
+                            });
+                });
     }
 
     function loadRecentChatsAndActiveChat() {
@@ -100,7 +124,7 @@ function CloudchatController($scope, $rootScope, $timeout, userService,
         recentChats.forEach(function (recentChat) {
             var friendId = recentChat.friend.id;
             var messages = recentChat.messages;
-            //{friend, messages:{id, content, senderId}}
+            //{friend, messages:{id, content, senderId, timestamp}}
             var chat = {
                 friend: $scope.getByField($scope.friends, "id", friendId),
                 messages: messages
@@ -111,6 +135,7 @@ function CloudchatController($scope, $rootScope, $timeout, userService,
                 $scope.contentBox.code = "chat";
             }
         });
+        gotoNewestMessage();
     }
 
     //--------------------------------------------------------------------------
@@ -136,6 +161,16 @@ function CloudchatController($scope, $rootScope, $timeout, userService,
         });
     };
 
+    $scope.countUnreadMessages = function (chat) {
+        var retVal = 0;
+        chat.messages.forEach(function (message) {
+            if (message.isUnread) {
+                retVal++;
+            }
+        });
+        return retVal;
+    };
+
     //--------------------------------------------------------------------------
     //  Events
     var isCtrlDown = false;
@@ -143,7 +178,7 @@ function CloudchatController($scope, $rootScope, $timeout, userService,
     var requestClearInput = false;
 
     $scope.onInputKeyup = function (event) {
-        var which = getWhich(event);
+        var which = self.getWhich(event);
         if (which == 17) {
             isCtrlDown = false;
         }
@@ -154,14 +189,14 @@ function CloudchatController($scope, $rootScope, $timeout, userService,
     };
 
     $scope.onInputKeydown = function (event) {
-        var which = getWhich(event);
+        var which = self.getWhich(event);
         if (which == 17) {
             isCtrlDown = true;
         }
     };
 
     $scope.onInputKeypress = function (event) {
-        var which = getWhich(event);
+        var which = self.getWhich(event);
         if (which == 13 && !isCtrlDown) {//ENTER
             var command = commandService.parse($scope.input);
             processCommand(command);
@@ -173,8 +208,26 @@ function CloudchatController($scope, $rootScope, $timeout, userService,
         processCommand(command);
     });
 
+    function onReceiveMessage(message) {
+        var friend = $scope.getByField($scope.friends, "id", message.senderId);
+        var shouldGotoNewestMessage = isContentBoxScrollInBottom();
+        var chat = getOrCreateChat(friend.username);
+
+        var messageBody = {
+            senderId: friend.id,
+            content: message.body.content,
+            timestamp: message.body.timestamp
+        };
+        pushMessageToChat(messageBody, chat);
+        //cache message
+        cacheService.saveMessage(friend.id, messageBody);
+        if (shouldGotoNewestMessage) {
+            gotoNewestMessage();
+        }
+    }
     //--------------------------------------------------------------------------
     //  Utils
+
     function processCommand(command) {
         if (command == null) {
             return;
@@ -223,22 +276,15 @@ function CloudchatController($scope, $rootScope, $timeout, userService,
                 content: stdMessage
             }
         });
-        $scope.activeChat.messages.push({
-            content: stdMessage,
-            senderId: $scope.me.id
-        });
-        $timeout(function () {
-            gotoNewestMessage();
-        }, 0);
-        //cache message
-        cacheService.saveMessage($scope.activeChat.friend.id, {
+        var messageBody = {
             senderId: $scope.me.id,
-            content: stdMessage
-        });
-    }
-
-    function getWhich(event) {
-        return event.which == 0 ? event.keyCode : event.which;
+            content: stdMessage,
+            timestamp: getCurrentServerTimestamp()
+        };
+        pushMessageToChat(messageBody, $scope.activeChat);
+        gotoNewestMessage();
+        //cache message
+        cacheService.saveMessage($scope.activeChat.friend.id, messageBody);
     }
 
     function getOrCreateChat(username) {
@@ -267,8 +313,15 @@ function CloudchatController($scope, $rootScope, $timeout, userService,
     }
 
     function gotoNewestMessage() {
+        $timeout(function () {
+            var div = document.getElementById("content-box");
+            div.scrollTop = div.scrollHeight;
+        }, 0);
+    }
+
+    function isContentBoxScrollInBottom() {
         var div = document.getElementById("content-box");
-        div.scrollTop = div.scrollHeight;
+        return (div.scrollHeight - div.scrollTop - div.clientHeight - 15) <= 0;
     }
 
     function fitWindow() {
@@ -278,7 +331,69 @@ function CloudchatController($scope, $rootScope, $timeout, userService,
         $scope.contentBox.height = $scope.body.height
                 - $("#command-input").outerHeight();
         //debug
-        console.log("Comand-input.outerHeight(): " + $("#command-input").outerHeight());
+        //console.log("Comand-input.outerHeight(): " + $("#command-input").outerHeight());
+    }
+
+    function getCurrentServerTimestamp() {
+        return (new Date()).getTime() - $scope.clock.deltaTimestamp;
+    }
+
+    /**
+     * 
+     * @param {type} message {senderId, content, timestamp, isUnread:optional}
+     * @param {type} chat
+     * @returns {undefined}
+     */
+    function pushMessageToChat(message, chat) {
+        chat.messages.push(message);
+        //build: isUnread value
+        var b = (message.senderId != $scope.me.id);//not send by "me"
+        var b1 = (chat != $scope.activeChat);
+        var b2 = !isContentBoxScrollInBottom();
+        var isUnread = b && (b1 || b2);
+        if (isUnread) {
+            message.isUnread = isUnread;
+        }
+    }
+
+    function checkUnreadMessagesWithConditions() {
+        var b = $scope.activeChat != null
+                && $scope.activeModule.code == "console"
+                && $scope.contentBox.code == "chat";
+        if (b) {
+            $rootScope.$apply(function () {
+                checkUnreadMessages();
+            });
+        }
+    }
+
+    function checkUnreadMessages() {
+        if ($scope.activeChat == null) {
+            return;
+        }
+        //ELSE:
+        $scope.activeChat.messages.forEach(function (message) {
+            if (message.isUnread) {
+                message.isUnread = !isVisibleMessage(message);
+            }
+        });
+    }
+    ;
+
+
+    function isVisibleMessage(message) {
+        var id = message.senderId + "-" + message.timestamp;
+
+        var messageElement = $("#" + id);
+        var scrollContainer = $("#content-box");
+
+        var elementTop = messageElement.offset().top;
+        var elementCenter = elementTop + messageElement.height() / 2;
+
+        var containerTop = scrollContainer.offset().top;
+        var containerBottom = containerTop + scrollContainer.height();
+
+        return ((elementCenter <= containerBottom) && (elementTop >= containerTop));
     }
 
     initialize();

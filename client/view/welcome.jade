@@ -6,5 +6,5 @@ table(style="width:100%")
             br
             span(ng-show="!socketIsReady")
                 |loading...
-            a(class="cloudchat-command-link" ng-click="$emit('cloudchat.run','$console')" ng-show="socketIsReady")
+            a(class="command-link" ng-click="$emit('cloudchat.run','$console')" ng-show="socketIsReady")
                 |console

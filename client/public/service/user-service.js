@@ -47,6 +47,18 @@ function UserService(stringService, socketService) {
         return friends;
     };
 
+    this.getFriendById = function (id) {
+        var retVal = Q.defer();
+        var friend = null;
+        friends.forEach(function (f) {
+            if (f.id == id) {
+                friend = f;
+            }
+        });
+        retVal.resolve(friend);
+        return retVal.promise;
+    };
+
     this.getMe = function () {
         return me;
     };

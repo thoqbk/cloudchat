@@ -12,13 +12,14 @@ div(ng-show="contentBox.code == 'friend'" ng-controller="UserController")
             td
                 |{{friend.id}}
             td
-                a(class="cloudchat-command-link" ng-click="openUserDetail(friend)")
+                img(ng-src="/image/online_bullet.png" ng-show="friend.onlineStatus == 'online'")
+                img(ng-src="/image/offline_bullet.png" ng-show="friend.onlineStatus == 'offline'")
+                a(class="command-link" ng-click="openUserDetail(friend)")
                     |{{friend.username}}
             td
                 |{{friend.fullName}}
             td
-                a(class="cloudchat-command-link" ng-click="$emit('cloudchat.run','$cw '+friend.username)")
+                a(class="command-link" ng-click="$emit('cloudchat.run','$cw '+friend.username)")
                     |chat
     div(ng-show="mode == 'profile'")
-        include profile.jade
-                
+        include ../profile.jade

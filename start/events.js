@@ -23,11 +23,10 @@ module.exports = function ($event, $logger, $response, userService, sessionServi
         userService.changeOnlineStatus(userId, "online", function () {
         });
         //broadcast to friends
-        userService.find({id: userId}, function (err, onlineUser) {
-            $response.toOnlineFriends(userId, {
-                ns: "io:cloudchat:user:go:online",
-                body: onlineUser
-            });
+        $response.toOnlineFriends(userId, {
+            stanza: "m",
+            ns: "io:cloudchat:user:go:online",
+            body: userId
         });
     });
 
@@ -36,6 +35,7 @@ module.exports = function ($event, $logger, $response, userService, sessionServi
         });
         //broadcast friends
         $response.toOnlineFriends(userId, {
+            stanza: "m",
             ns: "io:cloudchat:user:go:offline",
             body: userId
         });
@@ -55,7 +55,8 @@ module.exports = function ($event, $logger, $response, userService, sessionServi
             });
             var result = {
                 me: me,
-                friends: friends
+                friends: friends,
+                serverTimestamp: (new Date()).getTime()
             };
             $response.echo(socket, {
                 ns: "io:cloudchat:auth:login",

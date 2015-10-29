@@ -1,4 +1,16 @@
-var app = angular.module("app", ["ngSanitize"]);
+var app = angular.module("app", ["ngSanitize"])
+        .filter("timestampToDate", function () {
+            return CommonFilters.timestampToDate;
+        })
+        .filter("dateToString", function () {
+            return CommonFilters.dateToString;
+        })
+        .filter("timeToString", function () {
+            return CommonFilters.timeToString;
+        })
+        .filter("addNewDayMessages", function () {
+            return CommonFilters.addNewDayMessages;
+        });
 
 app.factory("stringService", function () {
     return new StringService();

@@ -8,7 +8,7 @@
  */
 function CacheService(stringService) {
     
-    var MAX_CACHED_MESSAGES = 10;
+    var MAX_CACHED_MESSAGES = 100;
     var MAX_CACHED_CHATS = 5;
 
     var recentChats = null;
@@ -24,6 +24,7 @@ function CacheService(stringService) {
         me = m;
         recentChatsKey = "cloudchat." + me.id + ".recentChats";
         activeFriendIdKey = "cloudchat." + me.id + ".activeFriendId";
+        activeFriendId = this.getActiveFriendId();
         recentChats = this.getRecentChats();
     };
 

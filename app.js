@@ -48,6 +48,12 @@ expressApp.get("/service/string-service.js", function (req, res) {
     res.sendFile(__dirname + "/lib/service/string-service.js");
 });
 
+expressApp.get("/script/q.js", function (req, res) {
+    res.sendFile(__dirname + "/node_modules/q/q.js");
+});
+
+
+
 var loaderJsInString = null;
 expressApp.get("/load", function (req, res) {
     if (loaderJsInString == null) {

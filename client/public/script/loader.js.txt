@@ -8,7 +8,7 @@
  */
 (function(w){
     var cloudchatFrame = document.createElement("iframe");
-    cloudchatFrame.src = "http://localhost:8689/?userId=" + ${meId};
+    cloudchatFrame.src = "http://localhost:5102/?userId=" + ${meId};
     cloudchatFrame.width = "600px";
     cloudchatFrame.height = "450px";
     document.documentElement.appendChild(cloudchatFrame);

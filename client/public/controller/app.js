@@ -17,7 +17,7 @@ app.factory("stringService", function () {
 });
 
 app.factory("cacheService", function (stringService) {
-    return new CacheService(stringService);
+    return new AutoCacheService(stringService);
 });
 
 app.factory("commandService", function (stringService) {

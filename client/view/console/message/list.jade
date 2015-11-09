@@ -14,7 +14,6 @@ div(ng-show="contentBox.code == 'chat'")
         tr(ng-repeat-end id="{{message.senderId + '-' + message.timestamp}}")
             td(ng-bind-html="message.content + (message.isUnread ? '*' : '')" 
                 ng-show="message.isNewDayMessage != true"
-                style="border:1px solid #000"
                 class="{{message.senderId == me.id ? 'cloudchat-message-me':'cloudchat-message-friend'}}")
             td(class="message-timestamp" style="width:60px"
                 ng-show="message.isNewDayMessage != true"

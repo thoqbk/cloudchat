@@ -15,9 +15,11 @@
  * @param {type} userService
  * @param {type} sessionService
  * @param {type} messageService
+ * @param {type} $config
  * @returns {undefined}
  */
-module.exports = function ($event, $logger, $response, userService, sessionService, messageService) {
+module.exports = function ($event, $logger, $response, userService,
+        sessionService, messageService, $config) {
     $event.listen("user.go.online", function (userId) {
         $logger.debug("User has just login. UserId: " + userId);
         userService.changeOnlineStatus(userId, "online", function () {
@@ -56,7 +58,10 @@ module.exports = function ($event, $logger, $response, userService, sessionServi
             var result = {
                 me: me,
                 friends: friends,
-                serverTimestamp: (new Date()).getTime()
+                serverTimestamp: (new Date()).getTime(),
+                nodeId: $config.nodeId,
+                clearClientCacheIfNodeIdChanges: $config.client.clearClientCacheIfNodeIdChanges,
+                cacheInterval: $config.client.cacheInterval
             };
             $response.echo(socket, {
                 ns: "io:cloudchat:auth:login",

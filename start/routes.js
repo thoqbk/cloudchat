@@ -24,6 +24,8 @@ module.exports = function (route) {
     route.iq("io:cloudchat:message:create", "MessageController@create");
     
     route.iq("io:cloudchat:message:find", "MessageController@find");
+    
+    route.m("io:cloudchat:message:patch", "MessageController@patch");
 
     route.iq("cloudchat:chat:create", "ChatController@create");
 

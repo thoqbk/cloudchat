@@ -11,7 +11,7 @@ var Q = require("q");
 
 module.exports = MessageController;
 
-function MessageController(messageService, $response) {
+function MessageController(messageService, userService, $response) {
 
     /**
      * message: {
@@ -24,7 +24,6 @@ function MessageController(messageService, $response) {
      */
     this.create = function ($input) {
         var receiverId = $input.getReceiverId();
-        var timestamp = (new Date()).getTime();
         $response.to(receiverId, {
             senderId: $input.getUserId(),
             receiverId: receiverId,
@@ -32,16 +31,18 @@ function MessageController(messageService, $response) {
             stanza: "m",
             body: {
                 content: $input.get("content"),
-                timestamp: timestamp
+                timestamp: $input.get("timestamp")
             }
         });
+
         //save message
         messageService.create({
             senderId: $input.getUserId(),
             receiverId: receiverId,
             content: $input.get("content"),
-            timestamp: timestamp
+            timestamp: $input.get("timestamp")
         });
+
     };
 
     this.find = function ($input) {
@@ -70,6 +71,32 @@ function MessageController(messageService, $response) {
                 .fail(function (error) {
                     response.body = error;
                     $response.echo($input.getSocket(), response);
+                });
+    };
+
+
+    this.patch = function ($input) {
+        var lastActiveTime = $input.get("lastActiveTime", (new Date()).getTime() - 24 * 3600);
+        userService.getFriendsById($input.getUserId())
+                .then(function (friends) {
+                    friends.forEach(function (friend) {
+                        messageService.find({
+                            userIds: [friend.id, $input.getUserId()],
+                            createTimeFrom: lastActiveTime
+                        }).then(function (messages) {
+                            if (messages.length > 0) {
+                                var response = {
+                                    ns: "io:cloudchat:message:patch",
+                                    stanza: "m",
+                                    body: {
+                                        friendId: friend.id,
+                                        messages: messages
+                                    }
+                                };
+                                $response.echo($input.getSocket(), response);
+                            }
+                        });
+                    });
                 });
     };
 }

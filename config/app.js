@@ -9,5 +9,10 @@ module.exports = {
     sessionChecker: {
         period: 5000, //ms
         timeout: 60000
+    },
+    nodeId: (new Date()).getTime(),
+    client: {
+        cacheInterval: 30, //second
+        clearClientCacheIfNodeIdChanges: true
     }
 };

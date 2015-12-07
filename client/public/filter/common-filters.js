@@ -1,3 +1,5 @@
+/* global _ */
+
 /**
  * Copyright (C) 2015, Cloudchat
  * 
@@ -22,6 +24,25 @@ var CommonFilters = {
         if (withSecond) {
             retVal += ":" + input.getSeconds();
         }
+        return retVal;
+    },
+    toShortName: function (input, maxLength) {
+        var retVal = "";
+        if (input == null || input == "") {
+            return retVal;
+            ;
+        }
+        //ELSE:
+        var regex = /(\b\w|[A-Z])/g;
+        var chars = [];
+        var found = null;
+        while ((found = regex.exec(input)) != null) {
+            chars.push(found[0]);
+        }
+        _.first(chars, maxLength == null ? 2 : maxLength).forEach(function (c) {
+            retVal += c;
+        });
+        //return
         return retVal;
     }
 };

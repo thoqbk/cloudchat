@@ -16,16 +16,10 @@ block content
     script(src="/controller/base-controller.js")
     script(src="/controller/cloudchat-controller.js")
     script(src="/controller/user-controller.js")
-
-    div(ng-app="app" ng-controller="CloudchatController" ng-cloak class="cloudchat-box")
-        div(class="cloudchat-form-footer" id="header")
-            include header.jade
-
-        div(ng-show="activeModule.code == 'home'")
-            include welcome.jade
-
-        div(ng-show="activeModule.code == 'console'")
-            include console/index.jade
-
-        div(class="cloudchat-form-footer" id="footer")
-            include footer.jade
+    
+   
+    div(class="navbar navbar-fixed-top navbar-default container-fluid" role="navigation")
+        include header.jade
+    div(class="container-fluid fill-height")
+        include console/index.jade
+    include footer.jade

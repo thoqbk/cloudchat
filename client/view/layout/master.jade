@@ -1,9 +1,13 @@
+link(rel="icon" href="/image/favicon.png" type="image/x-icon")
 link(rel="stylesheet", type="text/css", href="/style/cloudchat.css")
+link(rel="stylesheet", type="text/css", href="/style/bootstrap/css/bootstrap.min.css")
+script(src="/script/jquery-1.11.3.min.js")
+script(src="/style/bootstrap/js/bootstrap.min.js")
 script(src="http://localhost:5102/socket.io/socket.io.js")
-script(src="/script/jquery-1.8.3.min.js")
 script(src="/script/angular.min.js")
 script(src="/script/angular-sanitize.min.js")
 script(src="/script/q.js")
 script(src="/script/underscore-min.js")
-body
+body(ng-app="app" 
+    ng-controller="CloudchatController" ng-cloak class="cloudchat-box")
     block content

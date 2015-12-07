@@ -1,3 +1,5 @@
+/* global app */
+
 /**
  * Copyright (C) 2015, Cloudchat
  * 
@@ -44,6 +46,8 @@ function CloudchatController($scope, $rootScope, $timeout, userService,
         deltaTimestamp: 0
     };
 
+    $scope.activeParagraphs = null;
+
     //--------------------------------------------------------------------------
     //  Initialize
     var baseController = new BaseController($scope, $rootScope);
@@ -56,11 +60,8 @@ function CloudchatController($scope, $rootScope, $timeout, userService,
         var socketIO = io.connect("http://localhost:5102", {query: "userId=" + window.userId + "&deviceId=" + window.deviceId});
         socketService.setSocketIO(socketIO);
 
-        fitWindow();
-
         $(window).resize(function () {
             $rootScope.$apply(function () {
-                fitWindow();
                 checkUnreadMessagesWithConditions();
             });
         });
@@ -225,6 +226,11 @@ function CloudchatController($scope, $rootScope, $timeout, userService,
         if ($scope.activeChat != null) {
             cacheService.saveActiveFriendId($scope.activeChat.friend.id);
         }
+        $scope.activeParagraphs = buildActiveParagraphs();
+    });
+
+    $scope.$watchCollection("activeChat.messages", function () {
+        $scope.activeParagraphs = buildActiveParagraphs();
     });
 
     function onReceiveMessage(message) {
@@ -300,21 +306,24 @@ function CloudchatController($scope, $rootScope, $timeout, userService,
         } else if (command.type == "goHome") {
             $scope.activeModule.code = "home";
             requestClearInput = true;
-            //initialize chat module
-            $timeout(fitWindow, 0);
         } else if (command.type == "goConsole") {
             $scope.activeModule.code = "console";
             //initialize console module
-            $timeout(fitWindow, 0);
             clearInput();
         }
     }
 
     function createChat(username) {
+        var currentActiveChat = $scope.activeChat;
         var chat = getOrCreateChat(username);
         if (chat != null) {
             $scope.activeChat = chat;
-            checkUnreadMessages();
+            $timeout(function () {
+                checkUnreadMessages();
+            }, 0);
+        }
+        if (currentActiveChat != $scope.activeChat) {
+            gotoNewestMessage();
         }
     }
 
@@ -375,17 +384,7 @@ function CloudchatController($scope, $rootScope, $timeout, userService,
 
     function isContentBoxScrollInBottom() {
         var div = document.getElementById("content-box");
-        return (div.scrollHeight - div.scrollTop - div.clientHeight - 15) <= 0;
-    }
-
-    function fitWindow() {
-        $scope.body.height = $("body").outerHeight()
-                - $("#header").outerHeight()
-                - $("#footer").outerHeight();
-        $scope.contentBox.height = $scope.body.height
-                - $("#command-input").outerHeight();
-        //debug
-        //console.log("Comand-input.outerHeight(): " + $("#command-input").outerHeight());
+        return (div.scrollHeight - div.scrollTop - div.clientHeight - 25) <= 0;
     }
 
     function getCurrentServerTimestamp() {
@@ -455,6 +454,27 @@ function CloudchatController($scope, $rootScope, $timeout, userService,
         var containerBottom = containerTop + scrollContainer.height();
 
         return ((elementCenter <= containerBottom) && (elementTop >= containerTop));
+    }
+
+    function buildActiveParagraphs() {
+        var retVal = [];
+        if ($scope.activeChat == null) {
+            return retVal;
+        }
+        //ELSE:
+        var currentParagraph = null;
+        $scope.activeChat.messages.forEach(function (message) {
+            if (currentParagraph == null || currentParagraph.senderId != message.senderId) {
+                currentParagraph = {
+                    senderId: message.senderId,
+                    firstMessage: message,
+                    messages: []
+                };
+                retVal.push(currentParagraph);
+            }
+            currentParagraph.messages.push(message);
+        });
+        return retVal;
     }
 
     initialize();

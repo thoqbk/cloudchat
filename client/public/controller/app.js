@@ -1,3 +1,5 @@
+/* global CommonFilters */
+
 var app = angular.module("app", ["ngSanitize"])
         .filter("timestampToDate", function () {
             return CommonFilters.timestampToDate;
@@ -10,6 +12,9 @@ var app = angular.module("app", ["ngSanitize"])
         })
         .filter("addNewDayMessages", function () {
             return CommonFilters.addNewDayMessages;
+        })
+        .filter("toShortName", function () {
+            return CommonFilters.toShortName;
         });
 
 app.factory("stringService", function () {

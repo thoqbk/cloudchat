@@ -1,23 +1,18 @@
-div(ng-show="contentBox.code == 'chat'")
-    a(class="command-link" 
-        ng-show="activeChat != null && !activeChat.isUpToDate" 
-        ng-click="loadMoreMessages()").
-        Load more...
-    table(id="message-table" style="width:100%" cellpadding="0" cellspacing="0")
-        tr(ng-repeat-start="message in activeChat.messages track by $index" 
-            ng-init="previousDateString = ($index == 0 ? null : (activeChat.messages[$index-1].timestamp | timestampToDate | dateToString));"
-                    + "dateString = (message.timestamp | timestampToDate | dateToString);"
-            ng-show="previousDateString != dateString")
-            td(colspan="2" style="text-align:center")
-                |{{dateString}}
+div(ng-repeat="paragraph in activeParagraphs" class="media bottom")
+    div(ng-if="paragraph.senderId != me.id" class="media-left")
+        img(src="image/male.png" class="media-object img-circle" alt="" style="max-width: 32px; max-height: 32px")
+        div(class="avatar-title")
+            |{{getByField(friends, "id", paragraph.senderId).fullName}}      
 
-        tr(ng-repeat-end id="{{message.senderId + '-' + message.timestamp}}")
-            td(ng-bind-html="message.content + (message.isUnread ? '*' : '')" 
-                ng-show="message.isNewDayMessage != true"
-                class="{{message.senderId == me.id ? 'cloudchat-message-me':'cloudchat-message-friend'}}")
-            td(class="message-timestamp" style="width:60px"
-                ng-show="message.isNewDayMessage != true"
-                ng-init="previousTimeString = ($index == 0 ? null : (activeChat.messages[$index-1].timestamp | timestampToDate | timeToString));"
-                    + "timeString = (message.timestamp | timestampToDate | timeToString);")
-                span(ng-show="previousTimeString != timeString")
-                    |{{timeString}}
+    div(class="media-body")
+        p(ng-repeat="message in paragraph.messages track by $index" 
+            class="alert {{paragraph.senderId == me.id ? 'alert-info' : 'alert-success'}}"
+            id="{{message.senderId + '-' + message.timestamp}}")
+            span(ng-bind-html="message.content")
+            small(class="pull-right text-muted")
+                |12:23 PM
+
+    div(ng-if="paragraph.senderId == me.id" class="media-right")
+        img(src="image/male.png" class="media-object img-circle" alt="" style="max-width: 32px; max-height: 32px")
+        div(class="avatar-title")
+            |{{me.fullName}}

@@ -1,3 +1,5 @@
+/* global _ */
+
 /**
  * Copyright (C) 2015, Cloudchat
  * 

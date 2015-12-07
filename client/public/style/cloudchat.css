@@ -9,68 +9,36 @@ and open the template in the editor.
 */
 
 body{
-    margin:0px;
-    padding:0px;
-    overflow-y:hidden;
+    padding-top: 60px;
+    padding-bottom: 10px;
+}
+.avatar-title{
+    width: 64px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
 }
 
-.cloudchat-box{
-    width:100%;
-    height:100%;
-    margin:0px;
-    font-family:arial;
-    font-size: 13px;
+.fill-height{
+    min-height: 100%;
+    height: 100%;
 }
 
-.cloudchat-form-header{
-    background-color: #EBEEDD;
-    border-bottom-color: #CAD2A7;
-    border-bottom-style: solid;
-    border-bottom-width: 1px;
-    border-left-color: #CAD2A7;
-    border-right-color: #CAD2A7;
-    border-top-color: #CAD2A7;
-    border-top-style: solid;
-    border-top-width: 2px;
-    color: black;
-
-    font-weight: bold;
-    padding-bottom: 3px;
-    padding-top: 5px;
+.list-group-item{
+    border-radius: 0px !important;
 }
 
-.cloudchat-form-footer{
-    background-color: #E3EAED;
-    padding-bottom: 5px;
-    padding-top: 5px;
-    border-top: 1px solid #CCC;
-    font-size: 13px;
+.panel{
+    border-radius: 0px !important;
+    margin-bottom: 0px !important;
 }
 
-.command-link{
-    color: #719602;
-    font-size: 13px;
-    text-decoration: none;
-    cursor: pointer;
+.form-control{
+    border-radius: 0px !important;
 }
 
-.command-link:hover{
-    text-decoration: underline;
-}
-
-.cloudchat-message-me{
-    color: #3D7AD1;
-    font-size: 13px;
-    padding-bottom: 5px;
-}
-
-.cloudchat-message-friend{
-    color: #EDAD26;
-    font-size: 13px;
-    padding-bottom: 5px;
-}
-
-.message-timestamp{
-    color: #777;
-    font-style: italic;
+.alert{
+    border-radius: 1px !important;
+    padding:5px !important;
+    margin-bottom: 5px !important;
 }

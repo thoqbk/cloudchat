@@ -1,5 +1,23 @@
-|Cloudchat.io
-span(ng-show="socketIsReady")
-    |, hello&nbsp;
-    a( class="command-link").
-        {{me.fullName}}
+div(class="row")
+    div(class="col-sm-3 col-xs-2")
+        a(href="#" class="navbar-brand")
+            span
+                img(src="/image/logo.png")
+            span(class="hidden-xs")
+                |&nbsp;Cloudchat
+    div(class="col-sm-9 col-xs-10" style="padding-left:0px")
+        span(ng-show="activeChat != null" class="navbar-btn btn btn-info")
+            |Chat with {{activeChat.friend.fullName}}
+        div(class="btn-group pull-right")
+            span(class="navbar-btn btn btn-default glyphicon glyphicon-menu-hamburger" data-toggle="dropdown" style="border-radius:0px")
+            ul(class="dropdown-menu")
+                li
+                    a(href="#")
+                        |Profile                        
+                li
+                    a(href="#")
+                        |Settings
+                li(role="separator" class="divider")
+                li
+                    a(href="#")
+                        |Logout

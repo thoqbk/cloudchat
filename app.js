@@ -1,3 +1,5 @@
+/* global __dirname */
+
 /**
  * Copyright (C) 2015, Cloudchat
  *

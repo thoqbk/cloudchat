@@ -1,18 +1,12 @@
-div(ng-repeat="paragraph in activeParagraphs" class="media bottom")
-    div(ng-if="paragraph.senderId != me.id" class="media-left")
-        img(src="image/male.png" class="media-object img-circle" alt="" style="max-width: 32px; max-height: 32px")
-        div(class="avatar-title")
-            |{{getByField(friends, "id", paragraph.senderId).fullName}}      
-
-    div(class="media-body")
-        p(ng-repeat="message in paragraph.messages track by $index" 
-            class="alert {{paragraph.senderId == me.id ? 'alert-info' : 'alert-success'}}"
-            id="{{message.senderId + '-' + message.timestamp}}")
-            span(ng-bind-html="message.content")
-            small(class="pull-right text-muted")
-                |12:23 PM
-
-    div(ng-if="paragraph.senderId == me.id" class="media-right")
-        img(src="image/male.png" class="media-object img-circle" alt="" style="max-width: 32px; max-height: 32px")
-        div(class="avatar-title")
-            |{{me.fullName}}
+div(ng-repeat="paragraph in activeParagraphs" class="row paragraph")
+    div(class="col-xs-1")
+        img(ng-if="paragraph.senderId != me.id" src="image/male.png" class="img-circle" alt="" style="width:100%")
+    div(class="col-xs-11")
+        div(ng-repeat="message in paragraph.messages track by $index" 
+            class="row")
+            div(ng-bind-html="message.content"
+                class="col-xs-10 {{paragraph.senderId == me.id ? 'message-me' : 'message-friend'}} {{$index == 0 ? 'first-paragraph-message' : ''}} {{($index == paragraph.messages.length -1) ? 'last-paragraph-message' : ''}}"
+                id="{{message.senderId + '-' + message.timestamp}}")
+            div(class="col-xs-2")
+                small(class="text-muted")
+                    |12:23 PM

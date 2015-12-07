@@ -37,8 +37,28 @@ body{
     border-radius: 0px !important;
 }
 
-.alert{
-    border-radius: 1px !important;
-    padding:5px !important;
-    margin-bottom: 5px !important;
+.paragraph{
+    margin-top:10px;
+}
+
+.first-paragraph-message{
+    border-top:1px solid #DDD;
+    padding-top:10px;
+}
+
+.last-paragraph-message{
+    border-bottom:1px solid #DDD;
+}
+
+.message-me{
+    border-right: 3px solid #1b809e;
+    border-left: 1px solid #DDD;
+    text-align: right;
+    padding-bottom: 10px;
+}
+
+.message-friend{
+    border-left: 3px solid #63A34B;
+    border-right: 1px solid #DDD;
+    padding-bottom: 10px;
 }

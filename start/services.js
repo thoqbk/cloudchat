@@ -10,11 +10,6 @@
 //config
 var $config = require("../config/app.js");
 
-//logger
-var log4js = require("log4js");
-log4js.configure("config/log4js.json");
-var $logger = log4js.getLogger("app");
-
 //event service
 var Event = require("../lib/event.js");
 
@@ -33,17 +28,19 @@ var Response = require("../lib/response.js");
 
 /**
  * 
- * @param {type} register
- * @param {type} registerClass
+ * @param {type} container
+ * 
  * @returns {undefined}
  */
-module.exports = function (register, registerClass) {
-    register("$config", $config);
-    register("$logger", $logger);
-    registerClass("$event", Event);
-    registerClass("stringService", StringService);
-    registerClass("userService", UserService);
-    registerClass("sessionService", SessionService);
-    registerClass("messageService", MessageService);
-    registerClass("$response", Response);
+module.exports = function (container) {
+    container.register("$config", $config);
+    container.registerByClass("$event", Event);
+    container.registerByClass("stringService", StringService);
+    container.registerByClass("userService", UserService);
+    container.registerByClass("sessionService", SessionService);
+    container.registerByClass("messageService", MessageService);
+    container.registerByClass("$response", Response);
+
+    //invoke extension services
+    return require("../ext/services.js")(container);
 };

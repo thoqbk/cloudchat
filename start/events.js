@@ -45,7 +45,8 @@ module.exports = function ($event, $logger, $response, userService,
 
     $event.listen("socket.connection", function (socket) {
         var userId = sessionService.getUserIdBySocket(socket);
-        userService.find({}, function (err, users) {
+        
+        userService.find({}).then(function (users) {
             var friends = [];
             var me = null;
             users.forEach(function (user) {
@@ -63,6 +64,7 @@ module.exports = function ($event, $logger, $response, userService,
                 clearClientCacheIfNodeIdChanges: $config.client.clearClientCacheIfNodeIdChanges,
                 cacheInterval: $config.client.cacheInterval
             };
+            
             $response.echo(socket, {
                 ns: "io:cloudchat:auth:login",
                 stanza: "m",
@@ -70,4 +72,8 @@ module.exports = function ($event, $logger, $response, userService,
             });
         });
     });
+
+    //invoke extension events
+    require("../ext/events.js")($event, $logger, $response, userService,
+            sessionService, messageService, $config);
 };

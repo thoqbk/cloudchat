@@ -83,19 +83,20 @@ function MessageController(messageService, userService, $response) {
                         messageService.find({
                             userIds: [friend.id, $input.getUserId()],
                             createTimeFrom: lastActiveTime
-                        }).then(function (messages) {
-                            if (messages.length > 0) {
-                                var response = {
-                                    ns: "io:cloudchat:message:patch",
-                                    stanza: "m",
-                                    body: {
-                                        friendId: friend.id,
-                                        messages: messages
+                        })
+                                .then(function (messages) {
+                                    if (messages.length > 0) {
+                                        var response = {
+                                            ns: "io:cloudchat:message:patch",
+                                            stanza: "m",
+                                            body: {
+                                                friendId: friend.id,
+                                                messages: messages
+                                            }
+                                        };
+                                        $response.echo($input.getSocket(), response);
                                     }
-                                };
-                                $response.echo($input.getSocket(), response);
-                            }
-                        });
+                                });
                     });
                 });
     };

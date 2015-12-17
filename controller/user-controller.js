@@ -9,10 +9,6 @@ module.exports = UserController;
 
 function UserController($logger, $response, userService) {
 
-    this.message = "This's UserController";
-
-    $logger.info(this.message);
-
     this.create = function ($session, $input) {
         $logger.info("This's UserController.create");
         $logger.info("Message: " + $input.get());
@@ -29,14 +25,15 @@ function UserController($logger, $response, userService) {
         var user = $input.get();
         userService.update(user)
                 .then(function (id) {
-                    userService.find({id: id}, function (err, user) {
-                        $response.echo($input.getSocket(), {
-                            id: $input.getId(),
-                            ns: $input.getNs(),
-                            stanza: "iq",
-                            type: "result",
-                            body: user
-                        });
+                    return userService.find({id: id});
+                })
+                .then(function (user) {
+                    $response.echo($input.getSocket(), {
+                        id: $input.getId(),
+                        ns: $input.getNs(),
+                        stanza: "iq",
+                        type: "result",
+                        body: user
                     });
                 });
     };
@@ -84,18 +81,15 @@ function UserController($logger, $response, userService) {
         if ($input.has("ids")) {
             filter.ids = $input.get("ids");
         }
-
-        $response.echo($input.getSocket(), {
-            id: 123
-        });
-        userService.find(filter, function (err, users) {
-            $response.echo($input.getSocket(), {
-                receiverId: $input.getUserId(),
-                ns: $input.getNs(),
-                type: "result",
-                stanza: $input.getStanza(),
-                body: users
-            });
-        });
+        userService.find(filter)
+                .then(function (result) {
+                    $response.echo($input.getSocket(), {
+                        receiverId: $input.getUserId(),
+                        ns: $input.getNs(),
+                        type: "result",
+                        stanza: $input.getStanza(),
+                        body: result
+                    });
+                });
     };
 }

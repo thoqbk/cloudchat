@@ -14,5 +14,6 @@ module.exports = {
     client: {
         cacheInterval: 30, //second
         clearClientCacheIfNodeIdChanges: true
-    }
+    },
+    database: require("./database.js")
 };

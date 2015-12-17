@@ -15,15 +15,16 @@ function UserService(stringService, socketService) {
     var users = [];
 
     this.setFriends = function (fs) {
+        friends= [];
+        users = [];
         fs.forEach(function (f) {
             f.search = stringService.toFriendlyString(f.username + " " + f.fullName);
+            friends.push(f);
+            users.push(f);
         });
-        friends = fs;
-        var newUsers = fs;
         if (me != null) {
-            newUsers.push(me);
+            users.push(me);
         }
-        users = newUsers;
     };
 
     this.setMe = function (m) {

@@ -1,7 +1,9 @@
 extends layout/master.jade
 block content
     script.
+        var host = "#{host}";
         var userId = #{userId};
+        var token = "#{token}";
 
     script(src="/filter/common-filters.js")
 

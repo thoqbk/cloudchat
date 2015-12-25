@@ -1,4 +1,4 @@
-/* global app */
+/* global app, io */
 
 /**
  * Copyright (C) 2015, Cloudchat
@@ -57,7 +57,9 @@ function CloudchatController($scope, $rootScope, $timeout, userService,
 
         listenSocketEvents();
 
-        var socketIO = io.connect("http://localhost:5102", {query: "userId=" + window.userId + "&deviceId=" + window.deviceId});
+        var query = "userId=" + window.userId + "&deviceId=" + window.deviceId + "&token=" + window.token;
+
+        var socketIO = io.connect("http://" + window.host, {query: query});
         socketService.setSocketIO(socketIO);
 
         $(window).resize(function () {

@@ -22,8 +22,7 @@ module.exports = function ($event, $logger, $response, userService,
         sessionService, messageService, $config) {
     $event.listen("user.go.online", function (userId) {
         $logger.debug("User has just login. UserId: " + userId);
-        userService.changeOnlineStatus(userId, "online", function () {
-        });
+        userService.changeOnlineStatus(userId, "online");
         //broadcast to friends
         $response.toOnlineFriends(userId, {
             stanza: "m",
@@ -33,8 +32,7 @@ module.exports = function ($event, $logger, $response, userService,
     });
 
     $event.listen("user.go.offline", function (userId) {
-        userService.changeOnlineStatus(userId, "offline", function () {
-        });
+        userService.changeOnlineStatus(userId, "offline");
         //broadcast friends
         $response.toOnlineFriends(userId, {
             stanza: "m",
@@ -74,6 +72,6 @@ module.exports = function ($event, $logger, $response, userService,
     });
 
     //invoke extension events
-    require("../ext/events.js")($event, $logger, $response, userService,
+    require("../ext/chat-events.js")($event, $logger, $response, userService,
             sessionService, messageService, $config);
 };

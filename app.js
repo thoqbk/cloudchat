@@ -23,8 +23,16 @@ $logger.info("-----");
 $logger.info("Starting Cloudchat (c) 2015 Cloudchat.io");
 
 require("./start/services.js")(container)
+        .then(function(){
+            container.flushLazyServiceClasses();
+        })
         .then(function () {
-            return require("./start/http-server.js")(container);
+            var $config = container.resolve("$config");
+            if ($config.applicationMode == "app" || $config.applicationMode == "full") {
+                return require("./lib/chat-server.js")(container);
+            } else {
+                return require("./lib/cloud-service-server.js")(container);
+            }
         })
         .then(function () {
             var $config = container.resolve("$config");
@@ -32,13 +40,22 @@ require("./start/services.js")(container)
             var $logger = container.resolve("$logger");
 
             //register events
-            container.invoke(require("./start/events"));
+            if ($config.applicationMode == "full" || $config.applicationMode == "app") {
+                container.invoke(require("./start/chat-events.js"));
+            }
 
             var now = new Date();
             var nowInString = now.getDate() + "/" + now.getMonth() + "/" + now.getFullYear() + " " + now.getHours() + ":" + now.getMinutes() + ":" + now.getSeconds();
-            $logger.info("Start Cloudchat successfully in " + (now.getTime() - startTime) + "ms at port: " + $config.port + ". " + nowInString);
+            var appName = $config.applicationMode == "full" ? "Cloudchat" : ($config.applicationMode == "service" ? "Cloudchat-service" : "Cloudchat-app");
+            $logger.info("Start " + appName + " successfully in " + (now.getTime() - startTime)
+                    + "ms at port: " + ($config.applicationMode == "full" || $config.applicationMode == "app" ? $config.port : $config.remoteService.port)
+                    + ". " + nowInString);
             $logger.info("-----");
         })
         .fail(function (err) {
             $logger.info("Start cloudchat FAIL. Reason: " + err);
         });
+
+
+
+        

@@ -7,24 +7,25 @@
  * 
  */
 
-//config
 var $config = require("../config/app.js");
 
-//event service
 var Event = require("../lib/event.js");
 
-//string service
 var StringService = require("../lib/service/string-service.js");
 
-//user service
 var UserService = require("../lib/service/user-service.js");
 
-//session service
 var SessionService = require("../lib/session-service.js");
 
 var MessageService = require("../lib/service/message-service.js");
 
+var AuthenticationService = require("../lib/service/authentication-service.js");
+
 var Response = require("../lib/response.js");
+
+var _ = require("underscore");
+
+var Q = require("q");
 
 /**
  * 
@@ -33,14 +34,74 @@ var Response = require("../lib/response.js");
  * @returns {undefined}
  */
 module.exports = function (container) {
+    $logger = container.resolve("$logger");
+    
+    //get application mode
+    var applicationMode = "full";//app+service
+    process.argv.forEach(function (val) {
+        if (val == "mode=service") {
+            applicationMode = "service";
+        }
+        if (val == "mode=app") {
+            applicationMode = "app";
+        }
+    });
+    $config.applicationMode = applicationMode;
+    
+    $logger.info("Application mode: " + applicationMode);
+    
+    //Init default services
     container.register("$config", $config);
-    container.registerByClass("$event", Event);
     container.registerByClass("stringService", StringService);
-    container.registerByClass("userService", UserService);
-    container.registerByClass("sessionService", SessionService);
-    container.registerByClass("messageService", MessageService);
-    container.registerByClass("$response", Response);
 
-    //invoke extension services
-    return require("../ext/services.js")(container);
+    if (applicationMode == "full") {
+        container.registerByClass("$event", Event);
+        container.registerByClass("$response", Response);
+        container.registerByClass("sessionService", SessionService);
+        
+        container.registerByClass("userService", UserService);
+        container.registerByClass("messageService", MessageService);
+        container.registerByClass("authenticationService", AuthenticationService);
+        
+        //invoke extension services
+        return require("../ext/services.js")(container);
+    } else if (applicationMode == "app") {
+        container.registerByClass("$event", Event);
+        container.registerByClass("$response", Response);
+        container.registerByClass("sessionService", SessionService);
+        if (!_($config.remoteService.names).contains("userService")) {
+            container.registerByClass("userService", UserService);
+        }
+        if (!_($config.remoteService.names).contains("messageService")) {
+            container.registerByClass("messageService", MessageService);
+        }
+        if (!_($config.remoteService.names).contains("authenticationService")) {
+            container.registerByClass("authenticationService", AuthenticationService);
+        }                
+        //invoke extension services
+        var retVal = Q.defer();
+        require("../ext/services.js")(container)
+                .then(function () {
+                    return require("../lib/cloud-service-client.js")(container);
+                })
+                .then(function () {
+                    retVal.resolve();
+                })
+                .fail(function (error) {
+                    retVal.reject(error);
+                });
+        return retVal.promise;
+    } else {//service
+        container.registerByClass("$event", Event);
+        if (_($config.remoteService.names).contains("authenticationService")) {
+            container.registerByClass("authenticationService", AuthenticationService);
+        }
+        if (_($config.remoteService.names).contains("userService")) {
+            container.registerByClass("userService", UserService);
+        }
+        if (_($config.remoteService.names).contains("messageService")) {
+            container.registerByClass("messageService", MessageService);
+        }
+        return require("../ext/services.js")(container);
+    }
 };

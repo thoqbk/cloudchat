@@ -10,13 +10,15 @@
 
 var Q = require("q");
 
+var _ = require("underscore");
+
 module.exports = function (container) {
     return initializeMySqlConnectionPoolAndServices(container);
 };
 
 function initializeMySqlConnectionPoolAndServices(container) {
     var retVal = Q.defer();
-    
+
     var $config = container.resolve("$config");
     if ($config.database.default != "mysql") {
         retVal.resolve();
@@ -59,11 +61,21 @@ function initializeMySqlConnectionPoolAndServices(container) {
             container.register("mysqlConnectionPool", pool);
 
             //initialize UserServiceMySqlImpl, MessageServiceMySqlImpl
-            container.registerByClass("userService", require("./service/user-service-mysql-impl.js"));
-            container.registerByClass("messageService", require("./service/message-service-mysql-impl.js"));
+            var b = _($config.remoteService.names).contains("userService");
+            var b1 = ($config.applicationMode == "service" && b) || ($config.applicationMode == "full")
+                    || ($config.applicationMode == "app" && !b);
+            if (b1) {
+                container.registerByClass("userService", require("./service/user-service-mysql-impl.js"));
+                $logger.info("Register services: user-service-mysql-impl successfully!");
+            }
 
-            $logger.info("Register services: user-service-mysql-impl, message-service-mysql-impl successfully!");
-            
+            var b2 = _($config.remoteService.names).contains("messageService");
+            var b3 = ($config.applicationMode == "service" && b2) || ($config.applicationMode == "full")
+                    || ($config.applicationMode == "app" && !b2);
+            if (b3) {
+                container.registerByClass("messageService", require("./service/message-service-mysql-impl.js"));
+                $logger.info("Register services: message-service-mysql-impl successfully!");
+            }
             retVal.resolve();
         } else {
             $logger.info("Create mysql connection pool FAIL, reason: " + err);
